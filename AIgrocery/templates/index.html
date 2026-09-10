@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Grocery Planner</title>
+    <!-- Use Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div id="app-container">
+        
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-title">
+                <h2>SmartGrocery+</h2>
+                <span class="pantry-summary" id="pantry-summary-header">0 Items in Pantry</span>
+            </div>
+            <button class="btn-icon" id="btn-sync-receipt" title="Sync Digital Receipts"><ion-icon name="scan-outline"></ion-icon></button>
+        </header>
+
+        <!-- VIEWS -->
+        <main id="main-content">
+            
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="view active">
+                <p id="sync-status" class="hidden-alert"></p>
+                
+                <!-- Category/Quick Action browsing mock -->
+                <div class="category-browser horizontal-scroll mt-2">
+                    <div class="category-chip" data-category="All"><ion-icon name="apps"></ion-icon> All</div>
+                    <div class="category-chip" data-category="Fresh"><ion-icon name="nutrition"></ion-icon> Fresh</div>
+                    <div class="category-chip" data-category="Dairy"><ion-icon name="water"></ion-icon> Dairy</div>
+                    <div class="category-chip" data-category="Frozen"><ion-icon name="snow"></ion-icon> Frozen</div>
+                    <div class="category-chip" data-category="Bakery"><ion-icon name="pizza"></ion-icon> Bakery</div>
+                </div>
+
+                <div id="category-results" class="item-grid hidden mt-3"></div>
+
+                <div id="home-sections">
+                    <div class="section-title mt-4"><h3>Popular Items</h3></div>
+                    <div id="dash-popular" class="horizontal-scroll"></div>
+                    
+                    <div class="section-title mt-4"><h3>Recommended</h3></div>
+                    <div id="dash-recommended" class="horizontal-scroll"></div>
+                    
+                    <div class="section-title mt-4"><h3>Fresh Produce</h3></div>
+                    <div id="dash-fresh" class="horizontal-scroll"></div>
+                    
+                    <div class="section-title mt-4"><h3>Dairy & Essentials</h3></div>
+                    <div id="dash-dairy" class="horizontal-scroll"></div>
+                    
+                    <div class="section-title mt-4"><h3>Quick Meals</h3></div>
+                    <div id="dash-quick" class="horizontal-scroll pb-2"></div>
+                </div>
+            </section>
+
+            <!-- Pantry View -->
+            <section id="view-pantry" class="view hidden">
+                <div class="section-title">
+                    <h3>My Automated Pantry</h3>
+                    <span class="badge" id="pantry-count">0 items</span>
+                </div>
+                <div id="pantry-grid" class="item-grid mt-2"></div>
+            </section>
+
+            <!-- Planner View -->
+            <section id="view-planner" class="view hidden">
+                <div class="section-title">
+                    <h3>Meal Planner</h3>
+                </div>
+                <div class="card p-3 mt-2">
+                    <form id="plan-form">
+                        <label>Select Dietary Goal</label>
+                        <select id="diet-goal" class="form-select mt-1">
+                            <option value="high-protein">High Protein</option>
+                            <option value="weight-loss">Weight Loss</option>
+                            <option value="balanced">Balanced / Family</option>
+                            <option value="budget">Strict Budget</option>
+                        </select>
+                        <button type="submit" class="btn-primary w-100 mt-2">Generate Recipe</button>
+                    </form>
+                </div>
+                <div id="plan-results" class="mt-3 hidden"></div>
+            </section>
+
+            <!-- Cart View -->
+            <section id="view-cart" class="view hidden">
+                <div class="section-title">
+                    <h3>Price Comparison Panel</h3>
+                </div>
+                <div id="store-comparison-panel" class="mt-2 mb-3"></div>
+                <button id="btn-buy-cheapest" class="btn-primary w-100 hidden mb-3" onclick="window.buyCheapestCart()">Buy Selected Cart</button>
+                <div class="section-title">
+                    <h3>Optimized Cart</h3>
+                </div>
+                <div id="cart-container"></div>
+            </section>
+
+            <!-- Chatbot View -->
+            <section id="view-chat" class="view hidden">
+                <div class="chat-container">
+                    <div id="chat-history" class="chat-history">
+                        <div class="msg bot-msg">Hello! I'm your Smart Grocery Assistant. I can manage your groceries and recipes! Try asking 'give me the recipe for Pasta' or 'show me recipes with what I have'.</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Ask me something...">
+                        <button id="chat-send" class="btn-icon-primary"><ion-icon name="send"></ion-icon></button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FLOATING CART BUTTON -->
+        <div class="fab-container">
+            <button class="fab-btn" onclick="document.querySelector('[data-target=cart]').click()">
+                <ion-icon name="cart"></ion-icon>
+            </button>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-target="dashboard">
+                <ion-icon name="home"></ion-icon>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item" data-target="pantry">
+                <ion-icon name="cube"></ion-icon>
+                <span>Pantry</span>
+            </a>
+            <a href="#" class="nav-item" data-target="planner">
+                <ion-icon name="restaurant"></ion-icon>
+                <span>Meals</span>
+            </a>
+            <a href="#" class="nav-item" data-target="chat">
+                <ion-icon name="chatbubbles"></ion-icon>
+                <span>Chat</span>
+            </a>
+            <a href="#" class="nav-item" data-target="cart" style="display:none;"></a>
+        </nav>
+        
+        <!-- Modal Container for Full Recipes (Collapsible) -->
+        <div id="recipe-modal" class="modal hidden">
+            <div class="modal-content">
+                <button class="close-modal" id="close-modal">&times;</button>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=1.1"></script>
+</body>
+</html>
