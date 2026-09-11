@@ -1,4 +1,4 @@
-# Budget & Nutrition Optimizer AI Agent
+# Smart Pantry & Meal Engine
 
 A web-based AI application for grocery and meal planning. It helps users manage pantry items, track expiry dates, compare grocery prices, get nutrition information,
 and generate recipes based on available ingredients.
